@@ -129,5 +129,85 @@ export function createResolvers(fastify: FastifyInstance) {
       }
       return null;
     },
+    async createPost(args: {
+      dto: { title: string; content: string; authorId: string };
+    }) {
+      return fastify.prisma.post.create({
+        data: args.dto,
+      });
+    },
+    async changePost(args: { id: string; dto: { title?: string; content?: string } }) {
+      return fastify.prisma.post.update({
+        where: { id: args.id },
+        data: args.dto,
+      });
+    },
+    async deletePost(args: { id: string }) {
+      await fastify.prisma.post.delete({
+        where: { id: args.id },
+      });
+      return true;
+    },
+    async createProfile(args: {
+      dto: { isMale: boolean; yearOfBirth: number; userId: string; memberTypeId: string };
+    }) {
+      return fastify.prisma.profile.create({
+        data: args.dto,
+        include: { memberType: true },
+      });
+    },
+    async changeProfile(args: {
+      id: string;
+      dto: { isMale?: boolean; yearOfBirth?: number; memberTypeId?: string };
+    }) {
+      return fastify.prisma.profile.update({
+        where: { id: args.id },
+        data: args.dto,
+        include: { memberType: true },
+      });
+    },
+    async deleteProfile(args: { id: string }) {
+      await fastify.prisma.profile.delete({
+        where: { id: args.id },
+      });
+      return true;
+    },
+    async createUser(args: { dto: { name: string; balance: number } }) {
+      return fastify.prisma.user.create({
+        data: args.dto,
+      });
+    },
+    async changeUser(args: { id: string; dto: { name?: string; balance?: number } }) {
+      return fastify.prisma.user.update({
+        where: { id: args.id },
+        data: args.dto,
+      });
+    },
+    async deleteUser(args: { id: string }) {
+      await fastify.prisma.user.delete({
+        where: { id: args.id },
+      });
+      return true;
+    },
+    async subscribeTo(args: { userId: string; authorId: string }) {
+      await fastify.prisma.subscribersOnAuthors.create({
+        data: {
+          subscriberId: args.userId,
+          authorId: args.authorId,
+        },
+      });
+      return true;
+    },
+    async unsubscribeFrom(args: { userId: string; authorId: string }) {
+      await fastify.prisma.subscribersOnAuthors.delete({
+        where: {
+          subscriberId_authorId: {
+            subscriberId: args.userId,
+            authorId: args.authorId,
+          },
+        },
+      });
+      return true;
+    },
   };
 }
